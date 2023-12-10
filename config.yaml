@@ -1,8 +1,23 @@
 parameters:
-  IMG_HEIGHT: 320
-  IMG_WIDTH: 416
   NUM_CLASSES: 20
   INPUT_SHAPE: [320, 416, 3]
-  BATCH_SIZE: 16
-  LEARNING_RATE: 0.0001
+  BATCH_SIZE: 2
+  LEARNING_RATE: 0.001
   NUM_EPOCHS: 100
+  RANDOM_SEED: 42
+paths:
+  dataset_path: "/content/drive/MyDrive/MulticlassSegment-main/data"
+  output: "/content/drive/MyDrive/MulticlassSegment-main/output"
+checkpoint:
+  verbose: 1
+  save_best_only: True
+LROn:  
+  monitor: "val_loss"
+  factor: 0.1
+  patience: 5
+  min_lr: 0.000001
+  verbose: 1
+EarlyStopping:
+  monitor: 'val_loss'
+  patience: 20
+  restore_best_weights: False
