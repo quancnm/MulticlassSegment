@@ -32,12 +32,6 @@ python /path/to/test.py --config "/path/to/config/file"
 
 ## Result
 
-<img src="0000012.png" alt="..." width="250" />
-<img src="https://..." alt="..." width="250" />
-<img src="https://..." alt="..." width="250" />
-<img src="https://..." alt="..." width="250" />
-<img src="https://..." alt="..." width="250" />
-<img src="https://..." alt="..." width="250" />
-<img src="https://..." alt="..." width="250" />
+![](0000012.png)
 
 
