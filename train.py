@@ -1,58 +1,85 @@
-
 import os
 import numpy as np
 import tensorflow as tf
+import tensorrt
+from sklearn.model_selection import train_test_split
 from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, EarlyStopping
 import yaml
 from unet import Unet
-from custom_net import CustomSegmentationNet
+# from custom_net import CustomSegmentationNet
 from utils import create_dir, load_dataset, get_colormap
 from img_proc import tf_dataset
+import argparse
 
+class MyTrainer():
+    def __init__(self,config):
+      
+      # Access the hyperparameters
+      self.random_seed = config['parameters']['RANDOM_SEED']
+      self.num_classes = config['parameters']['NUM_CLASSES']
+      self.input_shape = config['parameters']['INPUT_SHAPE']
+      self.batch_size = config['parameters']['BATCH_SIZE']
+      self.learning_rate = config['parameters']['LEARNING_RATE']
+      self.num_epochs = config['parameters']['NUM_EPOCHS']
+
+      self.dataset_path = config['paths']['dataset_path']
+      self.classes, self.colormap = get_colormap(self.dataset_path)
+      self.output_path = config['paths']['output']
+
+      self.checkpoint_vb = config['checkpoint']['verbose']
+      self.checkpoint_save_best_only = config['checkpoint']['save_best_only']
+
+      self.LROn_monitor = config['LROn']['monitor']
+      self.LROn_factor = config['LROn']['factor']
+      self.LROn_patience = config['LROn']['patience']
+      self.LROn_min_lr = config['LROn']['min_lr']
+      self.LROn_vb = config['LROn']['verbose']
+
+      self.ES_monitor = config['EarlyStopping']['monitor']
+      self.ES_patience = config['EarlyStopping']['patience']
+      self.ES_rbw = config['EarlyStopping']['restore_best_weights']
+
+
+    def build_loader(self):
+      np.random.seed(self.random_seed)
+      tf.random.set_seed(self.random_seed)
+      (train_x, train_y), (valid_x, valid_y), (test_x, test_y) = load_dataset(self.dataset_path)
+
+      print(f"Train: {len(train_x)}/{len(train_y)} - Valid: {len(valid_x)}/{len(valid_y)} - Test: {len(test_x)}/{len(test_x)}")
+      
+      train_dataset = tf_dataset(train_x, train_y, batch=self.batch_size)
+      valid_dataset = tf_dataset(valid_x, valid_y, batch=self.batch_size)
+      return train_dataset, valid_dataset
+
+
+
+    def build_model(self):
+      model = Unet(self.input_shape, self.num_classes)
+      # model.load_weights(model_path)
+      model.compile(loss="categorical_crossentropy",optimizer=tf.keras.optimizers.Adam(self.learning_rate))
+      # model.summary()
+
+      callbacks = [
+          ModelCheckpoint(self.output_path, verbose=self.checkpoint_vb, save_best_only=self.checkpoint_save_best_only),
+          ReduceLROnPlateau(monitor=self.LROn_monitor, factor=self.LROn_factor, patience=self.LROn_patience, min_lr=self.LROn_min_lr, verbose=self.LROn_vb),
+          EarlyStopping(monitor=self.ES_monitor, patience=self.ES_patience, restore_best_weights=self.ES_rbw)
+      ]
+      return model, callbacks
+
+
+    def train(self):
+      train_dataset, valid_dataset = self.build_loader()
+      model, callbacks = self.build_model()
+      model.fit(train_dataset,validation_data=valid_dataset,epochs=self.num_epochs,callbacks=callbacks)
 
 
 if __name__ == "__main__":
-    
-    np.random.seed(42)
-    tf.random.set_seed(42)
-
-    dataset_path = "Multiclass-Segmentation/data"
-    model_path = "Multiclass-Segmentation/output"
-    create_dir("Multiclass-Segmentation/output")
-
-    with open('Multiclass-Segmentation/config.yaml', 'r') as file:
-        config = yaml.safe_load(file)
-
-    
-
-    # Access the hyperparameters
-    IMG_HEIGHT = config['parameters']['IMG_HEIGHT']
-    IMG_WIDTH = config['parameters']['IMG_WIDTH']
-    NUM_CLASSES = config['parameters']['NUM_CLASSES']
-    INPUT_SHAPE = config['parameters']['INPUT_SHAPE']
-    BATCH_SIZE = config['parameters']['BATCH_SIZE']
-    LEARNING_RATE = config['parameters']['LEARNING_RATE']
-    NUM_EPOCHS = config['parameters']['NUM_EPOCHS']
-    CLASSES, COLORMAP = get_colormap(dataset_path)
-    
-    #Loading the dataset
-    (train_x, train_y), (valid_x, valid_y), (test_x, test_y) = load_dataset(dataset_path)
-
-    #Create Dataset
-    train_dataset = tf_dataset(train_x, train_y, batch=BATCH_SIZE)
-    valid_dataset = tf_dataset(valid_x, valid_y, batch=BATCH_SIZE)
-
-    #Model
-    model = Unet(INPUT_SHAPE, NUM_CLASSES)
-    # model.load_weights(model_path)
-    model.compile(loss="categorical_crossentropy",optimizer=tf.keras.optimizers.Adam(LEARNING_RATE))
-    # model.summary()
-
-    
-    callbacks = [
-        ModelCheckpoint(model_path, verbose=1, save_best_only=True),
-        ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=5, min_lr=1e-7, verbose=1),
-        EarlyStopping(monitor='val_loss', patience=20, restore_best_weights=False)
-    ]
-
-    model.fit(train_dataset,validation_data=valid_dataset,epochs=NUM_EPOCHS,callbacks=callbacks)
+  parser = argparse.ArgumentParser()
+  parser.add_argument("--config", default="", metavar="FILE", help="path to config file")
+  parser.add_argument("--output", default="", metavar="FILE", help="path to config file")
+  args = parser.parse_args()
+  
+  with open(args.config, 'r') as file:
+    config = yaml.safe_load(file)
+  Mytrainer = MyTrainer(config)
+  Mytrainer.train()
