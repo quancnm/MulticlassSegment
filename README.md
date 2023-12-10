@@ -32,6 +32,6 @@ python /path/to/test.py --config "/path/to/config/file"
 
 ## Result
 
-![](0000012.png)
+![](results/0000012.png)
 
 
