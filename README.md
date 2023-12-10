@@ -22,13 +22,15 @@ pip install -r requirements.txt
 
 ## How to use
 
-Training 
+### Training 
+To train the model, execute the following command:
 
-python /path/to/train.py --config "/path/to/config/file"
+'''python /path/to/train.py --config "/path/to/config/file"'''
 
-Test
+### Test
+To perform testing, use the following command:
 
-python /path/to/test.py --config "/path/to/config/file"
+'''python /path/to/test.py --config "/path/to/config/file"'''
 
 ## Result
 
