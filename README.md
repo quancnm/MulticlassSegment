@@ -16,6 +16,28 @@ In this project, I explore two different neural network architectures for multic
 
 2. Custom Segmentation Network: Apart from U-Net, I design and implement a custom neural network architecture tailored to the specific multiclass segmentation task.
 
+## Installation
+
+pip install -r requirements.txt
+
 ## How to use
+
+Training 
+
+python /path/to/train.py --config "/path/to/config/file"
+
+Test
+
+python /path/to/test.py --config "/path/to/config/file"
+
+## Result
+
+<img src="0000012.png" alt="..." width="250" />
+<img src="https://..." alt="..." width="250" />
+<img src="https://..." alt="..." width="250" />
+<img src="https://..." alt="..." width="250" />
+<img src="https://..." alt="..." width="250" />
+<img src="https://..." alt="..." width="250" />
+<img src="https://..." alt="..." width="250" />
 
 
