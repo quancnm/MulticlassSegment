@@ -33,7 +33,7 @@ To perform testing, use the following command:
 ```python /path/to/test.py --config "/path/to/config/file" ```
 
 ## Result
-
+The image on the left hand side is the ground truth and the right hand side is the prediction
 ![](results/0006031.png)
 ![](results/0005702.png)
 ![](results/0005365.png)
