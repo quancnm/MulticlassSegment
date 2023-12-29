@@ -2,6 +2,8 @@
 
 This project focuses on performing multiclass segmentation on images using two different neural network architectures: U-Net and a custom-designed segmentation network. The goal is to accurately segment objects in images into various classes.
 
+
+Notebook deploy model: https://colab.research.google.com/drive/12B9kXZbK_cSuO9HXucJu7QglPavnEGKy?usp=sharing
 ## Overview
 
 Program language: Python
