@@ -1,3 +1,4 @@
+MODEL: 'deeplab' #or 'unet'
 parameters:
   NUM_CLASSES: 20
   INPUT_SHAPE: [320, 416, 3]
@@ -5,6 +6,7 @@ parameters:
   LEARNING_RATE: 0.001
   NUM_EPOCHS: 100
   RANDOM_SEED: 42
+  DL_BACKBONE: 'resnet50'
 paths:
   dataset_path: "/content/drive/MyDrive/MulticlassSegment-main/data"
   output: "/content/drive/MyDrive/MulticlassSegment-main/output"
